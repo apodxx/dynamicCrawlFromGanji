@@ -5,6 +5,10 @@
 1.我们先看下[赶集网招聘](http://linyi.ganji.com/zpshichangyingxiao/),也就是我们要爬取的内容
 ![index首页](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/%E9%A6%96%E9%A1%B51.png)
 
+我们需要的名称
+![招聘名称](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/name.png)
+![招聘联系人和电话](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/phone_linkman.png)
+
 
 ### 需要的内容
 1. Python环境及配置pip源
@@ -18,6 +22,8 @@
 	* 这个部分需要好好理解一下 如果你学过正则表达式或者beatuifulsoup 那么代码中的部分替换即可  
 
 ### 第一步
+![第一步图片](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/name1.png)
+![第二步图片](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/name2.png)
 找到我们要爬取的代码,然后使用`urllib2`来获取网页内容, 得到网页内容然后使用`xpath`提取到每个招聘信息的网址
 
 	crawlUrl = "http://linyi.ganji.com/	zpshichangyingxiao"
@@ -29,7 +35,7 @@
     "//dl[@class='list-noimg job-list clearfix new-dl']/dt/a[@class='list_title gj_tongji']/@href")
     
     
-  ---此处插入图片
+  ![代码结果](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/result2.png)
    
 ### 第二步
 我们发现上面代码结果 有的是
@@ -57,7 +63,7 @@
         
 部分代码结果:
 
-	--此处插入图片
+	![代码结果](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/result1.png)
 	
       
         	
@@ -75,7 +81,7 @@
     	splits=i.split("/")
     	id=splits[len(splits)-1][:-5]
     	urlContent.append(id)
-将截取的内容    	
+将截取的内容保存到urlContent中    	
    
 ### 第四步
 这也是最重要的一步,我们先在此处贴出代码然后一步步分析
@@ -104,7 +110,9 @@ header的作用就是模仿浏览器进行操作,并将cookie添加到请求头�
 接下来就是重点了,敲黑板!!! 当我们打开保存在list中的存放的链接的时候,我们发现在网页源代码中并没有发现我们需要的手机号,哪去那里了呢?
 这其实就是前面说的页面的动态加载,手机号等信息是使用js动态渲染出来的,所以 这时我们需要右键`检查`,找到`network`中的`all`,然后点击`查看完成电话`,会发现下方列表中会出现很多信息,如图
  
- ===>此处插入图片
+ ![动态网页](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/QQ20171206-175527%402x.png)
+ ![动态网页1](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/js1.png)
+ ![动态网页2](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/js1.png)
  
 找到上面的图片中那一项 我们发现我们请求的真正的url,在代码也就是requesturl,这里面有两个键值对是需要我们注意的是reply,jobinfo和domain,我们会发现jobinfo这个信息,毫无规律可言,事实上,后面如果不写这个键值对也是可以的,因此可以忽略,reply如果我们仔细发现应该是
 307%3B+请求url的中的数字(也就是我们第三步中截取的内容)+3%3B2&,domain是什么 就不说了.
@@ -143,7 +151,7 @@ header的作用就是模仿浏览器进行操作,并将cookie添加到请求头�
 ### 第五步
 经历上面几步的操作 我们最终看到输出结果
 
-==>此处添加图片
+![代码结果](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/result.png)
 
 最后附上代码地址:
 	[gitbub地址](https://github.com/apodxx/dynamicCrawlFromGanji/tree/master/code/ganji)
