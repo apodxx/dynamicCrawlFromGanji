@@ -1,13 +1,14 @@
-# 动态爬取赶集网招聘信息
+
+# Python动态爬取赶集网招聘信息
 > 最近闲得很,所以趁这段时间重拾关于爬虫的一些东西 教程的内容就是利用Python将赶集网中动态信息爬取下来
 
 ### 我们的需求
 1.我们先看下[赶集网招聘](http://linyi.ganji.com/zpshichangyingxiao/),也就是我们要爬取的内容
-![index首页](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/%E9%A6%96%E9%A1%B51.png)
+![index首页](http://p0kzdnfmg.bkt.clouddn.com/17-12-7/34161627.jpg)
 
-我们需要的名称
-![招聘名称](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/name.png)
-![招聘联系人和电话](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/phone_linkman.png)
+我们需要的招聘名称,手机号及招聘联系人
+![招聘名称](http://p0kzdnfmg.bkt.clouddn.com/17-12-7/55418659.jpg)
+![招聘联系人和电话](http://p0kzdnfmg.bkt.clouddn.com/17-12-7/78751359.jpg)
 
 
 ### 需要的内容
@@ -22,11 +23,11 @@
 	* 这个部分需要好好理解一下 如果你学过正则表达式或者beatuifulsoup 那么代码中的部分替换即可  
 
 ### 第一步
-![第一步图片](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/name1.png)
-![第二步图片](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/name2.png)
+![第一步图片](http://p0kzdnfmg.bkt.clouddn.com/17-12-7/47289727.jpg)
+![第二步图片](http://p0kzdnfmg.bkt.clouddn.com/17-12-7/40902902.jpg)
 找到我们要爬取的代码,然后使用`urllib2`来获取网页内容, 得到网页内容然后使用`xpath`提取到每个招聘信息的网址
 
-	crawlUrl = "http://linyi.ganji.com/	zpshichangyingxiao"
+	crawlUrl = "http://linyi.ganji.com/zpshichangyingxiao"
 	response = urllib2.urlopen(crawlUrl)
 	html = response.read();
 	selector = etree.HTML(html)
@@ -34,8 +35,8 @@
 	content = selector.xpath(
     "//dl[@class='list-noimg job-list clearfix new-dl']/dt/a[@class='list_title gj_tongji']/@href")
     
-    
-  ![代码结果](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/result2.png)
+部分代码结果:    
+![代码结果](http://p0kzdnfmg.bkt.clouddn.com/17-12-7/99622443.jpg)
    
 ### 第二步
 我们发现上面代码结果 有的是
@@ -49,6 +50,7 @@
 而如果我们打开上面的长的连接,发现网址栏却是
 
 	http://linyi.ganji.com/zpshichangyingxiao/2876795251x.htm
+
 这个就说明网页发生了重定向 类似于JavaEE中的 response.sendRedirect()这个方法 因此 我们需要使用`request`得到得到我们真正要跳转到的网址,并保存到list中,代码如下:
 
 	i = 0;
@@ -63,7 +65,7 @@
         
 部分代码结果:
 
-	![代码结果](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/result1.png)
+![代码结果](http://p0kzdnfmg.bkt.clouddn.com/17-12-7/76062626.jpg)
 	
       
         	
@@ -71,9 +73,11 @@
 将第二步中的结果遍历然后切割字符串得到后面的的数字,例如:
 
 	http://linyi.ganji.com/zpshichangyingxiao/2705159292x.htm
+
 通过截取得到
 
 	2705159292
+
 至于为什么要这么做 我在后面会讲述,在此处先埋一个坑.
 
 	urlContent=[];
@@ -81,12 +85,14 @@
     	splits=i.split("/")
     	id=splits[len(splits)-1][:-5]
     	urlContent.append(id)
+
 将截取的内容保存到urlContent中    	
    
 ### 第四步
 这也是最重要的一步,我们先在此处贴出代码然后一步步分析
 
 	cookie = '''GANJISESSID=abe790f7f7bc1b03045b3a2ab843fe16; path=/; domain=.ganji.com'''
+
 我们知道 一般我们在登录了一个网站后,网页便会产生一个cookie,什么是cookie?当然不是小甜饼,简单地说就是登录访问地址后留下的记录,详细的可以参考的百度百科,如果我们没有添加cookie而是直接添加访问那么后面操作得不到手机号和联系人信息,爬取的页面也会重定向首页
 	
 		
@@ -96,6 +102,7 @@
 	'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
 	'Cookie': cookie
 	}
+
 header的作用就是模仿浏览器进行操作,并将cookie添加到请求头中,否则浏览器会认为是程序在抓取,继而浏览器报500的错误
 
 	for j in range(len(urlContent)):
@@ -106,20 +113,23 @@ header的作用就是模仿浏览器进行操作,并将cookie添加到请求头�
     	name = content1.xpath("//div[@class='d-c-left-hear']/h1[@class='f24 fc4b h31']/text()")
     	tel = content.xpath("//div[@class='apply-pos-v2-tit']/b/text()")
     	linkman = content.xpath("//div[@class='apply-pos-v2-tit']/span[@class='font-grey']/text()")
-    	print name[0]+tel[0]+"\t"+linkman[0]    
-接下来就是重点了,敲黑板!!! 当我们打开保存在list中的存放的链接的时候,我们发现在网页源代码中并没有发现我们需要的手机号,哪去那里了呢?
-这其实就是前面说的页面的动态加载,手机号等信息是使用js动态渲染出来的,所以 这时我们需要右键`检查`,找到`network`中的`all`,然后点击`查看完成电话`,会发现下方列表中会出现很多信息,如图
+    	print name[0]+tel[0]+"\t"+linkman[0]  
+
+接下来就是重点了,敲黑板!!! 
+当我们打开保存在list中的存放的链接的时候,我们发现在网页源代码中并没有发现我们需要的手机号,哪去那里了呢?
+这其实就是前面说的页面的动态加载,手机号等信息是使用js动态渲染出来的,所以 这时我们需要右键`检查`,找到`network`中的`all`,然后点击`查看完整电话`,会发现下方列表中会出现很多信息,如图
  
- ![动态网页](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/QQ20171206-175527%402x.png)
- ![动态网页1](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/js1.png)
- ![动态网页2](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/js1.png)
+ ![动态网页](http://p0kzdnfmg.bkt.clouddn.com/17-12-7/55545290.jpg)
+ ![动态网页1](http://p0kzdnfmg.bkt.clouddn.com/17-12-7/82812632.jpg)
+ ![动态网页2](http://p0kzdnfmg.bkt.clouddn.com/17-12-7/44287724.jpg)
  
 找到上面的图片中那一项 我们发现我们请求的真正的url,在代码也就是requesturl,这里面有两个键值对是需要我们注意的是reply,jobinfo和domain,我们会发现jobinfo这个信息,毫无规律可言,事实上,后面如果不写这个键值对也是可以的,因此可以忽略,reply如果我们仔细发现应该是
-307%3B+请求url的中的数字(也就是我们第三步中截取的内容)+3%3B2&,domain是什么 就不说了.
+**307%3B+请求url的中的数字(也就是我们第三步中截取的内容)+3%3B2&**,domain是什么 就不说了.
 	
-	请求的url:
+请求的url:
+
 	http://linyi.ganji.com/zpshichangyingxiao/2898829283x.htm
-	动态加载的url:
+动态加载的url:
 	http://www.ganji.com/pub/pub.php?act=pub&
 	method=load&
 	cid=11&
@@ -131,9 +141,12 @@ header的作用就是模仿浏览器进行操作,并将cookie添加到请求头�
 	from=viewFullPhone&
 	source_position=wanted_detail_tel_pub
 	
-	请求的url:
+请求的url:
+
 	http://linyi.ganji.com/zpshichangyingxiao/2869001712x.htm
-	动态加载的url:
+
+动态加载的url:
+
 	http://www.ganji.com/pub/pub.php?act=pub&method=load&
 	cid=11&
 	jobinfo=237%2C161728&
@@ -151,7 +164,7 @@ header的作用就是模仿浏览器进行操作,并将cookie添加到请求头�
 ### 第五步
 经历上面几步的操作 我们最终看到输出结果
 
-![代码结果](https://github.com/apodxx/dynamicCrawlFromGanji/blob/master/image/result.png)
+![代码结果](http://p0kzdnfmg.bkt.clouddn.com/17-12-7/88019828.jpg)
 
 最后附上代码地址:
 	[gitbub地址](https://github.com/apodxx/dynamicCrawlFromGanji/tree/master/code/ganji)
